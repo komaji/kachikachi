@@ -29,8 +29,40 @@ def pull_request_diff(number)
   client.pull_request(GITHUB_REPO, number, accept: 'application/vnd.github.v3.diff')
 end
 
-def pull_request_diffs
-  pull_requests.map(&:number).map(&method(:pull_request_diff))
+def pull_request_patch_list(pr_diff)
+  patch = ''
+  patch_list = []
+  body = false
+  lines = pr_diff.lines
+
+  lines.each_with_index do |line, index|
+    case line
+    when /^diff/
+      next if patch.empty?
+
+      patch_list << patch
+      patch = ''
+      body = false
+    when /^@@\s-\d+,\d+\s\+\d+,\d+\s@@/
+      body = true
+    else
+      next unless body
+
+      patch << line
+      last_line = lines.count == index + 1
+      patch_list << patch if last_line && !patch.empty?
+    end
+  end
+
+  patch_list
 end
 
-puts pull_request_diffs
+def all_pull_requests_patch_list
+  pull_requests
+    .map(&:number)
+    .map(&method(:pull_request_diff))
+    .map(&method(:pull_request_patch_list))
+    .flatten
+end
+
+puts all_pull_requests_patch_list
