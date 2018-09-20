@@ -65,4 +65,20 @@ def all_pull_requests_patch_list
     .flatten
 end
 
-puts all_pull_requests_patch_list
+def remove_unmodified_lines(pr_patch)
+  pr_patch.gsub(/^\s.*(\n|\r\n|\r)/, '')
+end
+
+def remove_added_lines(pr_patch)
+  pr_patch.gsub(/^\+.*(\n|\r\n|\r)/, '')
+end
+
+def remove_white_space(pr_patch)
+  pr_patch.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, '')
+end
+
+def only_removed_patch(pr_patch)
+  remove_added_lines(remove_unmodified_lines(remove_white_space(pr_patch)))
+end
+
+puts only_removed_patch(all_pull_requests_patch_list.join("\n")).lines.count
