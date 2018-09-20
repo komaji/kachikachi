@@ -21,8 +21,16 @@ end
 
 def pull_requests
   client.pull_requests(GITHUB_REPO, state: 'all').select do |pr|
-    pr.milestone.title == GITHUB_MILESTONE && pr.user.login == user_name
+    pr.milestone&.title == GITHUB_MILESTONE && pr.user.login == user_name
   end
 end
 
-puts pull_requests
+def pull_request_diff(number)
+  client.pull_request(GITHUB_REPO, number, accept: 'application/vnd.github.v3.diff')
+end
+
+def pull_request_diffs
+  pull_requests.map(&:number).map(&method(:pull_request_diff))
+end
+
+puts pull_request_diffs
