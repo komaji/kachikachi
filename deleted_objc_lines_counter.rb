@@ -5,7 +5,7 @@ GITHUB_REPO='komaji/test_danger'
 GITHUB_MILESTONE='v1.0.0'
 
 def client
-  Octokit::Client.new(access_token: GITHUB_API_TOKEN)
+  Octokit::Client.new(access_token: GITHUB_API_TOKEN, auto_paginate: true)
 end
 
 def milestone_number
