@@ -3,6 +3,7 @@ require 'octokit'
 GITHUB_API_TOKEN=ENV['GITHUB_API_TOKEN']
 GITHUB_REPO='komaji/test_danger'
 GITHUB_MILESTONE='v1.0.0'
+TARGET_FILE_REGEXP=/^.*\.(m|h)/
 
 class Patch
   attr_accessor :file_name, :body
@@ -104,6 +105,7 @@ def all_pull_requests_patch_list
 end
 
 removed_patches_count = all_pull_requests_patch_list
+                          .select{ |p| puts p.file_name;p.file_name =~ TARGET_FILE_REGEXP }
                           .map(&:body)
                           .map(&:only_removed_patch)
                           .map(&:body)
