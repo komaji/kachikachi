@@ -4,6 +4,7 @@ GITHUB_API_TOKEN=ENV['GITHUB_API_TOKEN']
 GITHUB_REPO='komaji/test_danger'
 GITHUB_MILESTONE='v1.0.0'
 TARGET_FILE_REGEXP=/^.*\.(m|h)/
+TARGET_PULL_REQUEST_NUMBERS=[3]
 
 class Patch
   attr_accessor :file_name, :body
@@ -61,6 +62,10 @@ def pull_requests
   end
 end
 
+def pull_requests_numbers
+  TARGET_PULL_REQUEST_NUMBERS || pull_requests.map(&:number)
+end
+
 def pull_request_diff(number)
   client.pull_request(GITHUB_REPO, number, accept: 'application/vnd.github.v3.diff')
 end
@@ -97,8 +102,7 @@ def pull_request_patch_list(pr_diff)
 end
 
 def all_pull_requests_patch_list
-  pull_requests
-    .map(&:number)
+  pull_requests_numbers
     .map(&method(:pull_request_diff))
     .map(&method(:pull_request_patch_list))
     .flatten
