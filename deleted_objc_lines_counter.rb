@@ -45,13 +45,6 @@ def client
   Octokit::Client.new(access_token: GITHUB_API_TOKEN, auto_paginate: true)
 end
 
-def milestone_number
-  milestones = client.list_milestones(GITHUB_REPO).find do |milestone|
-    milestone.title == GITHUB_MILESTONE
-  end
-  milestones.number
-end
-
 def user_name
   client.user.login
 end
