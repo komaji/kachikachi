@@ -9,7 +9,33 @@ class Patch
 
   def initialize(file_name, body)
     @file_name = file_name || ''
+    @body = PatchBody.new(body)
+  end
+end
+
+class PatchBody
+  attr_accessor :body
+
+  def initialize(body)
     @body = body || ''
+  end
+
+  def only_removed_patch
+    removed_unmodified_lines
+      .removed_added_lines
+      .removed_white_space
+  end
+
+  def removed_unmodified_lines
+    PatchBody.new(@body.gsub(/^\s.*(\n|\r\n|\r)/, ''))
+  end
+
+  def removed_added_lines
+    PatchBody.new(@body.gsub(/^\+.*(\n|\r\n|\r)/, ''))
+  end
+
+  def removed_white_space
+    PatchBody.new(@body.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, ''))
   end
 end
 
@@ -77,20 +103,10 @@ def all_pull_requests_patch_list
     .flatten
 end
 
-def remove_unmodified_lines(pr_patch)
-  pr_patch.gsub(/^\s.*(\n|\r\n|\r)/, '')
-end
-
-def remove_added_lines(pr_patch)
-  pr_patch.gsub(/^\+.*(\n|\r\n|\r)/, '')
-end
-
-def remove_white_space(pr_patch)
-  pr_patch.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, '')
-end
-
-def only_removed_patch(pr_patch)
-  remove_added_lines(remove_unmodified_lines(remove_white_space(pr_patch)))
-end
-
-puts "👋👋👋 #{only_removed_patch(all_pull_requests_patch_list.map(&:body).join("\n")).lines.count} lines 👋👋👋"
+removed_patches_count = all_pull_requests_patch_list
+                          .map(&:body)
+                          .map(&:only_removed_patch)
+                          .map(&:body)
+                          .join
+                          .lines.count
+puts "👋👋👋 #{removed_patches_count} lines 👋👋👋"
