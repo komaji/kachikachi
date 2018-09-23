@@ -2,9 +2,10 @@ require 'octokit'
 
 GITHUB_API_TOKEN=ENV['GITHUB_API_TOKEN']
 GITHUB_REPO='komaji/test_danger'
-GITHUB_MILESTONE=nil
+GITHUB_MILESTONE='v1.0.0'
 TARGET_FILE_REGEXP=/^.*\.(m|h)/
-TARGET_PULL_REQUEST_NUMBERS=[1]
+TARGET_PULL_REQUEST_NUMBERS=nil
+PULL_REQUEST_STATE='closed'
 
 class Patch
   attr_accessor :file_name, :body
@@ -50,7 +51,7 @@ def user_name
 end
 
 def pull_requests
-  client.pull_requests(GITHUB_REPO, state: 'all').select do |pr|
+  client.pull_requests(GITHUB_REPO, state: PULL_REQUEST_STATE).select do |pr|
     !GITHUB_MILESTONE || pr.milestone&.title == GITHUB_MILESTONE &&
       pr.user.login == user_name
   end
