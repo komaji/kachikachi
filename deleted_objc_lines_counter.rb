@@ -6,6 +6,7 @@ GITHUB_MILESTONE='v1.0.0'
 TARGET_FILE_REGEXP=/^.*\.(m|h)/
 TARGET_PULL_REQUEST_NUMBERS=nil
 PULL_REQUEST_STATE='closed'
+IGNORE_WHITE_SPACE=false
 
 class Patch
   attr_accessor :file_name, :body
@@ -24,9 +25,10 @@ class PatchBody
   end
 
   def only_removed_patch
-    removed_unmodified_lines
+    patch = removed_unmodified_lines
       .removed_added_lines
-      .removed_white_space
+    patch.removed_white_space if IGNORE_WHITE_SPACE
+    patch
   end
 
   def removed_unmodified_lines
