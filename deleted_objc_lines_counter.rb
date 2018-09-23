@@ -24,22 +24,22 @@ class PatchBody
     @body = body || ''
   end
 
-  def only_removed_patch
-    patch = removed_unmodified_lines
-      .removed_added_lines
-    patch.removed_white_space if IGNORE_WHITE_SPACE
+  def only_removed
+    patch = ignore_unmodified_lines
+      .ignore_added_lines
+    patch.ignore_white_space if IGNORE_WHITE_SPACE
     patch
   end
 
-  def removed_unmodified_lines
+  def ignore_unmodified_lines
     PatchBody.new(@body.gsub(/^\s.*(\n|\r\n|\r)/, ''))
   end
 
-  def removed_added_lines
+  def ignore_added_lines
     PatchBody.new(@body.gsub(/^\+.*(\n|\r\n|\r)/, ''))
   end
 
-  def removed_white_space
+  def ignore_white_space
     PatchBody.new(@body.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, ''))
   end
 end
@@ -105,11 +105,11 @@ def all_pull_requests_patch_list
     .flatten
 end
 
-removed_patches_count = all_pull_requests_patch_list
+removed_patches_total_count = all_pull_requests_patch_list
                           .select{ |p| puts p.file_name;p.file_name =~ TARGET_FILE_REGEXP }
                           .map(&:body)
-                          .map(&:only_removed_patch)
+                          .map(&:only_removed)
                           .map(&:body)
                           .join
                           .lines.count
-puts "👋👋👋 #{removed_patches_count} lines 👋👋👋"
+puts "👋👋👋 #{removed_patches_total_count} lines 👋👋👋"
