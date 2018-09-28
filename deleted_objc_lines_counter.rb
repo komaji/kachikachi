@@ -3,6 +3,7 @@ require 'thor'
 
 class CLI < Thor
   desc 'count', 'Count removed code lines.'
+  option 'endpoint', default: ENV['GITHUB_API_ENDPOINT'] || 'https://api.github.com/'
   option 'token', default: ENV['GITHUB_API_TOKEN']
   option 'repo', required: true
   option 'file-regexp'
@@ -60,6 +61,10 @@ class GitHub
 
   private
   def client
+    Octokit.configure do |c|
+      c.api_endpoint = @options['endpoint']
+    end
+
     @client ||= Octokit::Client.new(access_token: @options[:token], auto_paginate: true)
   end
 end
@@ -119,6 +124,10 @@ class PullRequest
 
   private
   def client
+    Octokit.configure do |c|
+      c.api_endpoint = @options['endpoint']
+    end
+
     @client ||= Octokit::Client.new(access_token: @options['token'], auto_paginate: true)
   end
 end
