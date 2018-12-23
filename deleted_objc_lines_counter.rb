@@ -7,14 +7,15 @@ class CLI < Thor
   option 'token', default: ENV['GITHUB_API_TOKEN']
   option 'repo', required: true
   option 'file-regexp'
-  option 'milestone'
+  option 'milestones', type: :array
   option 'pull-request-numbers', type: :array
   option 'state', default: :closed
   option 'ignore-white-space', type: :boolean, default: true
   option 'ignore-comment-regexp'
   option 'user'
+  
   def count
-    options[:milestone] || options['pull-request-numbers'] or raise 'Need to specify milestone or pull request numbers. Please use --milestone or --pull-request-numbers options.'
+    @options[:milestones] || @options['pull-request-numbers'] or raise 'Need to specify milestones or pull request numbers. Please use --milestones or --pull-request-numbers options.'
     Counter.new(self).count
   end
 end
@@ -67,7 +68,7 @@ class GitHub
   private
   def milestone_numbers
     client.list_milestones(@options[:repo], state: :all).select{ |milestone|
-      milestone.title == @options[:milestone]
+      @options[:milestones].include?(milestone.title)
     }.map(&:number)
   end
 
