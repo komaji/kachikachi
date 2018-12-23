@@ -48,6 +48,9 @@ class GitHub
   end
 
   def pull_requests
+    pull_request_numbers = @options['pull-request-numbers']
+    return pull_request_numbers.map { |number| PullRequest.new(number, @options) } if pull_request_numbers
+    
     options = {
       state: @options[:state]
     }
@@ -58,7 +61,7 @@ class GitHub
       client.list_issues(@options[:repo], options).select(&:pull_request)
     }.flatten
 
-    prs.map{ |pr| PullRequest.new(pr, @options) }
+    prs.map{ |pr| PullRequest.new(pr.number, @options) }
   end
 
   private
@@ -78,10 +81,10 @@ class GitHub
 end
 
 class PullRequest
-  attr_accessor :content, :client
+  attr_accessor :number, :client
 
-  def initialize(content, options)
-    @content = content
+  def initialize(number, options)
+    @number = number
     @options = options
   end
 
@@ -124,10 +127,6 @@ class PullRequest
 
   def diff
     client.pull_request(@options[:repo], number, accept: 'application/vnd.github.v3.diff')
-  end
-
-  def number
-    content.number
   end
 
   private
