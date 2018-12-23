@@ -11,6 +11,7 @@ class CLI < Thor
   option 'pull-request-numbers', type: :array
   option 'state', default: :closed
   option 'ignore-white-space', type: :boolean, default: true
+  option 'ignore-comment-regexp'
   option 'user'
   def count
     options[:milestone] || options['pull-request-numbers'] or raise 'Need to specify milestone or pull request numbers. Please use --milestone or --pull-request-numbers options.'
@@ -150,6 +151,8 @@ class PatchBody
     patch = ignore_unmodified_lines
       .ignore_added_lines
     patch = patch.ignore_white_space if @options['ignore-white-space']
+    pattern = @options['ignore-comment-regexp']
+    patch = patch.ignore_comment_lines(pattern) if pattern
 
     patch
   end
@@ -164,6 +167,11 @@ class PatchBody
 
   def ignore_white_space
     PatchBody.new(@content.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, ''), @options)
+  end
+
+  def ignore_comment_lines(pattern)
+    comment_line_regexp = Regexp.new("^[-+]?\s*#{pattern}.*(\n|\r\n|\r)")
+    PatchBody.new(@content.gsub(comment_line_regexp, ''), @options)
   end
 end
 
