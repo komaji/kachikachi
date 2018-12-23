@@ -1,5 +1,5 @@
 require 'octokit'
-require 'patch'
+require 'kachikachi/patch'
 
 module Kachikachi
   class PullRequest

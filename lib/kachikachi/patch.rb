@@ -1,4 +1,4 @@
-require 'patch_body'
+require 'kachikachi/patch_body'
 
 module Kachikachi
   class Patch

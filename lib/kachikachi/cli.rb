@@ -1,7 +1,7 @@
 require 'thor'
-require 'counter'
+require 'kachikachi/counter'
 
-module KachiKachi
+module Kachikachi
   class CLI < Thor
     desc 'count', 'Count removed code lines.'
     option 'endpoint', default: ENV['GITHUB_API_ENDPOINT'] || 'https://api.github.com/'
