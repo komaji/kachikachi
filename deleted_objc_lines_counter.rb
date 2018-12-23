@@ -11,6 +11,7 @@ class CLI < Thor
   option 'pull-request-numbers', type: :array
   option 'state', default: :closed
   option 'ignore-white-space', type: :boolean, default: true
+  option 'user', type: :string
   def count
     options[:milestone] || options['pull-request-numbers'] or raise 'Need to specify milestone or pull request numbers. Please use --milestone or --pull-request-numbers options.'
     Counter.new(self).count
@@ -49,14 +50,10 @@ class GitHub
     prs = client.pull_requests(@options[:repo], state: @options[:state]).select do |pr|
       (!@options[:milestone] || pr.milestone&.title == @options[:milestone]) &&
         (!@options['pull-request-numbers'] || @options['pull-request-numbers'].map(&:to_i).include?(pr.number)) &&
-        pr.user.login == user_name
+        (!@options[:user] || @options[:user] == pr.user.login)
     end
 
     prs.map{ |pr| PullRequest.new(pr, @options) }
-  end
-
-  def user_name
-    client.user.login
   end
 
   private
