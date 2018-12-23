@@ -83,7 +83,7 @@ class GitHub
 end
 
 class PullRequest
-  attr_accessor :number, :client, :content
+  attr_accessor :number, :client, :content, :diff
 
   def initialize(number, options)
     @number = number
@@ -127,15 +127,15 @@ class PullRequest
     patch_list
   end
 
-  def diff
-    client.pull_request(@options[:repo], number, accept: 'application/vnd.github.v3.diff')
-  end
-
   def base
     content.base
   end
 
   private
+  def diff
+    @diff ||= client.pull_request(@options[:repo], number, accept: 'application/vnd.github.v3.diff')
+  end
+
   def content
     @content ||= client.pull_request(@options[:repo], number)
   end
