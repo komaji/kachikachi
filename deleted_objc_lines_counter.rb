@@ -11,7 +11,7 @@ class CLI < Thor
   option 'pull-request-numbers', type: :array
   option 'state', default: :closed
   option 'ignore-white-space', type: :boolean, default: true
-  option 'user', type: :string
+  option 'user'
   def count
     options[:milestone] || options['pull-request-numbers'] or raise 'Need to specify milestone or pull request numbers. Please use --milestone or --pull-request-numbers options.'
     Counter.new(self).count
