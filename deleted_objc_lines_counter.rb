@@ -48,16 +48,26 @@ class GitHub
   end
 
   def pull_requests
-    prs = client.pull_requests(@options[:repo], state: @options[:state]).select do |pr|
-      (!@options[:milestone] || pr.milestone&.title == @options[:milestone]) &&
-        (!@options['pull-request-numbers'] || @options['pull-request-numbers'].map(&:to_i).include?(pr.number)) &&
-        (!@options[:user] || @options[:user] == pr.user.login)
-    end
+    options = {
+      state: @options[:state]
+    }
+    options[:creator] = @options[:user] if @options[:user]
+
+    prs = milestone_numbers.map { |number|
+      options[:milestone] = number
+      client.list_issues(@options[:repo], options).select(&:pull_request)
+    }.flatten
 
     prs.map{ |pr| PullRequest.new(pr, @options) }
   end
 
   private
+  def milestone_numbers
+    client.list_milestones(@options[:repo], state: :all).select{ |milestone|
+      milestone.title == @options[:milestone]
+    }.map(&:number)
+  end
+
   def client
     Octokit.configure do |c|
       c.api_endpoint = @options['endpoint']
