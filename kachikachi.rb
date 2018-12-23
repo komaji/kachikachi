@@ -35,7 +35,7 @@ class Counter
       puts "#{patch.file_name}: deleted #{lines_count} lines"
     }
 
-    total_lines_count = lines_count_list.inject(:+)
+    total_lines_count = lines_count_list.inject(0, :+)
     
     puts "👋👋👋 total #{total_lines_count} lines 👋👋👋"
   end
