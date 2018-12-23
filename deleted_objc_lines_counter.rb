@@ -27,7 +27,7 @@ class Counter
     
     lines_count_list = []
     target_patch_list.map { |patch|
-      lines_count = patch.body.only_removed.body.lines.count
+      lines_count = patch.body.only_removed.content.lines.count
       lines_count_list << lines_count
       puts "#{patch.file_name}: deleted #{lines_count} lines"
     }
@@ -135,17 +135,17 @@ end
 class Patch
   attr_accessor :file_name, :body
 
-  def initialize(file_name, body, options)
+  def initialize(file_name, content, options)
     @file_name = file_name || ''
-    @body = PatchBody.new(body, options)
+    @body = PatchBody.new(content, options)
   end
 end
 
 class PatchBody
-  attr_accessor :body
+  attr_accessor :content
 
-  def initialize(body, options)
-    @body = body || ''
+  def initialize(content, options)
+    @content = content || ''
     @options = options
   end
 
@@ -158,15 +158,15 @@ class PatchBody
   end
 
   def ignore_unmodified_lines
-    PatchBody.new(@body.gsub(/^\s.*(\n|\r\n|\r)/, ''), @options)
+    PatchBody.new(@content.gsub(/^\s.*(\n|\r\n|\r)/, ''), @options)
   end
 
   def ignore_added_lines
-    PatchBody.new(@body.gsub(/^\+.*(\n|\r\n|\r)/, ''), @options)
+    PatchBody.new(@content.gsub(/^\+.*(\n|\r\n|\r)/, ''), @options)
   end
 
   def ignore_white_space
-    PatchBody.new(@body.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, ''), @options)
+    PatchBody.new(@content.gsub(/^(-|\+)\s*(\n|\r\n|\r)/, ''), @options)
   end
 end
 
