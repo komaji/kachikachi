@@ -12,6 +12,7 @@ class CLI < Thor
   option 'state', default: :closed
   option 'ignore-white-space', type: :boolean, default: true
   option 'ignore-comment-regexp'
+  option 'base-branch'
   option 'user'
   
   def count
@@ -57,12 +58,12 @@ class GitHub
     }
     options[:creator] = @options[:user] if @options[:user]
 
-    prs = milestone_numbers.map { |number|
+    issues = milestone_numbers.map { |number|
       options[:milestone] = number
       client.list_issues(@options[:repo], options).select(&:pull_request)
     }.flatten
 
-    prs.map{ |pr| PullRequest.new(pr.number, @options) }
+    issues.map{ |issue| PullRequest.new(issue.number, @options) }.select{ |pr| pr.base.ref == @options['base-branch'] }
   end
 
   private
@@ -82,7 +83,7 @@ class GitHub
 end
 
 class PullRequest
-  attr_accessor :number, :client
+  attr_accessor :number, :client, :content
 
   def initialize(number, options)
     @number = number
@@ -130,7 +131,15 @@ class PullRequest
     client.pull_request(@options[:repo], number, accept: 'application/vnd.github.v3.diff')
   end
 
+  def base
+    content.base
+  end
+
   private
+  def content
+    @content ||= client.pull_request(@options[:repo], number)
+  end
+
   def client
     Octokit.configure do |c|
       c.api_endpoint = @options['endpoint']
