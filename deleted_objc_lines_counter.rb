@@ -23,18 +23,18 @@ class Counter
   end
 
   def count
-    all_target_patch_list = GitHub.new(@cli.options).pull_requests
-                              .map(&:target_patch_list)
-                              .flatten
-    removed_patches_total_count = all_target_patch_list
-                                    .map(&:body)
-                                    .map(&:only_removed)
-                                    .map(&:body)
-                                    .join
-                                    .lines
-                                    .count
+    target_patch_list = GitHub.new(@cli.options).pull_requests.map(&:target_patch_list).flatten
+    
+    lines_count_list = []
+    target_patch_list.map { |patch|
+      lines_count = patch.body.only_removed.body.lines.count
+      lines_count_list << lines_count
+      puts "#{patch.file_name}: deleted #{lines_count} lines"
+    }
 
-    puts "👋👋👋 #{removed_patches_total_count} lines 👋👋👋"
+    total_lines_count = lines_count_list.inject(:+)
+    
+    puts "👋👋👋 total #{total_lines_count} lines 👋👋👋"
   end
 end
 
