@@ -6,7 +6,7 @@ require "kachikachi/version"
 Gem::Specification.new do |spec|
   spec.name          = "kachikachi"
   spec.version       = Kachikachi::VERSION
-  spec.authors       = ["Tatsuya Kojima"]
+  spec.authors       = ["komaji"]
   spec.email         = ["don.kojikoji@gmail.com"]
 
   spec.summary       = %q{Counter of deleted lines on GitHub pull request.}
