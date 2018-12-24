@@ -1,4 +1,4 @@
-require 'kachikachi/github'
+require 'kachikachi/git_hub'
 
 module Kachikachi
   class Counter
