@@ -1,4 +1,5 @@
 require 'octokit'
+require 'kachikachi/pull_request'
 
 module Kachikachi
   class GitHub
