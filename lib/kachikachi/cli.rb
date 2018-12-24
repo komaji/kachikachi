@@ -5,7 +5,7 @@ module Kachikachi
   class CLI < Thor
     desc 'count', 'Count removed code lines.'
     option 'endpoint', default: ENV['GITHUB_API_ENDPOINT'] || 'https://api.github.com/'
-    option 'token', default: ENV['GITHUB_API_TOKEN']
+    option 'token', default: ENV['KACHIKACHI_GITHUB_TOKEN']
     option 'repo', required: true
     option 'file-regexp'
     option 'milestones', type: :array
